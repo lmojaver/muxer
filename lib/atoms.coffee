@@ -6,7 +6,13 @@ class Atom
     ]
 
 class SubAtom
-  constructor: (@fourcc) ->
+  constructor: (fourcc, version, flags) ->
+    @header = new Buffer.concat [
+      new Buffer(4).fill(0),
+      new Buffer(4).fill(fourcc),
+      new Buffer(1).fill(0).writeUInt(version),
+      new Buffer(3).fill(0).writeUIntBE(flags, 3)
+    ]
 
 
 class FtypAtom extends Atom
@@ -45,16 +51,15 @@ class MoovAtom extends Atom
     @mdia = null
     @minf = null
     @stbl = null
+    super 'moov'
 
-class MvhdAtom
-  constructor: ->
-    @version = null
-    @flags = null
-    @created = null
-    @modified = null
-    @timeScale = null
-    @duration = null
-    @playbackSpeed = null
+class MvhdAtom extends SubAtom
+  constructor: (version, flags) ->
+    @created = new Buffer(8).fill(0)
+    @modified = new Buffer(8).fill(0)
+    @timeScale = new Buffer(4).fill(0)
+    @duration = new Buffer(8).fill(0)
+    @playbackSpeed = 
     @volume = null
     @reserved = null
     @wgmvA = null
@@ -71,6 +76,7 @@ class MvhdAtom
     @qtSelection = null
     @qtCurrent = null
     @nextTrackId = null
+    super 'mvhd', 0, 0
 
 class TrakAtom
   constructor: ->
